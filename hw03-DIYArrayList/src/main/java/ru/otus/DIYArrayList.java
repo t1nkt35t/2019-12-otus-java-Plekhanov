@@ -1,110 +1,20 @@
 package ru.otus;
 
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import java.util.stream.Stream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 public class DIYArrayList<T> implements List<T> {
 
-    public Object[] array;
-    final int DEFAULT_CAPACITY = 10;
+    private static final int DEFAULT_CAPACITY = 10;
     private int size;
+    private Object[] elements;
 
     public DIYArrayList() {
-        array = new Object[DEFAULT_CAPACITY];
-    }
-
-    @Override
-    public boolean add(T t) {
-        if (size == array.length) {
-            array = Arrays.copyOf(array, getNewCapacity());
-        }
-        array[size] = t;
-        size ++;
-        return true;
-    }
-
-    private int getNewCapacity() {
-        return size * 2;
-    }
-
-    @Override
-    public T set(int index, T element) {
-        T oldElement = (T) array[index];
-        array[index] = element;
-        return oldElement;
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends T> c) {
-        for(T t : c) {
-            add(t);
-        }
-        return true;
-    }
-
-    @Override
-    public T get(int i) {
-        return (T)array[i];
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        return new Iterator<T>() {
-            int cursor;
-            @Override
-            public boolean hasNext() {
-                return cursor < size();
-            }
-            @Override
-            public T next() {
-                return (T)array[cursor++];
-            }
-        };
-    }
-
-    @Override
-    public void replaceAll(UnaryOperator<T> operator) {
-
-    }
-
-
-    @Override
-    public Spliterator<T> spliterator() {
-        return null;
-    }
-
-    @Override
-    public void add(int index, T element) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <T1> T1[] toArray(IntFunction<T1[]> generator) {
-        return null;
-    }
-
-    @Override
-    public boolean removeIf(Predicate<? super T> filter) {
-        return false;
-    }
-
-    @Override
-    public Stream<T> stream() {
-        return null;
-    }
-
-    @Override
-    public Stream<T> parallelStream() {
-        return null;
-    }
-
-    @Override
-    public void forEach(Consumer<? super T> action) {
-
+        elements = new Object[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -114,85 +24,213 @@ public class DIYArrayList<T> implements List<T> {
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return size == 0;
+    }
+
+    @Override
+    public boolean add(T t) {
+        if (elements.length == size) {
+            elements = Arrays.copyOf(elements, newCapacity());
+        }
+        elements[size++] = t;
+        return true;
     }
 
     @Override
     public boolean contains(Object o) {
-        return false;
+        return indexOf(o) >= 0;
     }
 
     @Override
-    public ListIterator<T> listIterator() {
-        return null;
+    public Iterator<T> iterator() {
+        return new Iter();
+    }
+
+    private class Iter implements Iterator<T> {
+        int cursor;
+        int lastRet = -1;
+
+        Iter() {
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cursor < size();
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public T next() {
+            if (cursor >= size()) {
+                throw new NoSuchElementException();
+            }
+            lastRet = cursor;
+            T nextElement = (T) get(cursor);
+            cursor++;
+            return nextElement;
+        }
     }
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        return Arrays.copyOf(elements, size);
     }
 
     @Override
     public <T1> T1[] toArray(T1[] a) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends T> c) {
+        boolean result = false;
+        for (T t : c) {
+            result |= add(t);
+        }
+        return result;
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends T> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
+
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void clear() {
-
+        throw new UnsupportedOperationException();
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public T get(int index) {
+        return (T) elements[index];
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public T set(int index, T element) {
+        if (index > size) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+        T oldValue = (T) elements[index];
+        elements[index] = element;
+        return oldValue;
+    }
+
+    @Override
+    public void add(int index, T element) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public T remove(int index) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int indexOf(Object o) {
-        return 0;
+        if (o == null) {
+            for (int i = 0; i < size; i++) {
+                if (elements[i] == null) {
+                    return i;
+                }
+            }
+        }
+        for (int i = 0; i < size; i++) {
+            if (elements[i].equals(0)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        return 0;
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ListIterator<T> listIterator() {
+        return new ListIter(0);
     }
 
     @Override
     public ListIterator<T> listIterator(int index) {
-        return null;
+        throw new UnsupportedOperationException();
+    }
+
+    private class ListIter extends Iter implements ListIterator<T> {
+        ListIter(int index) {
+            super();
+            cursor = index;
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return cursor != 0;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public T previous() {
+            return (T) elements[--cursor];
+        }
+
+        @Override
+        public int nextIndex() {
+            return cursor;
+        }
+
+        @Override
+        public int previousIndex() {
+            return cursor - 1;
+        }
+
+        @Override
+        public void remove() {
+
+        }
+
+        @Override
+        public void set(T t) {
+            DIYArrayList.this.set(lastRet, t);
+        }
+
+        @Override
+        public void add(T t) {
+            elements[++cursor] = t;
+        }
+    }
+
+    private int newCapacity() {
+        return size * 2;
     }
 
     @Override
     public List<T> subList(int fromIndex, int toIndex) {
-        return null;
+        throw new UnsupportedOperationException();
     }
-
 
 }
 
