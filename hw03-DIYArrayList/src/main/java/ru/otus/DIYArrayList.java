@@ -32,7 +32,8 @@ public class DIYArrayList<T> implements List<T> {
         if (elements.length == size) {
             elements = Arrays.copyOf(elements, newCapacity());
         }
-        elements[size++] = t;
+        elements[size] = t;
+        size++;
         return true;
     }
 
@@ -93,11 +94,10 @@ public class DIYArrayList<T> implements List<T> {
 
     @Override
     public boolean addAll(Collection<? extends T> c) {
-        boolean result = false;
         for (T t : c) {
-            result |= add(t);
+            add(t);
         }
-        return result;
+        return true;
     }
 
     @Override
