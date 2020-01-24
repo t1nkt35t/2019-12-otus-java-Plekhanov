@@ -8,10 +8,6 @@ import java.util.List;
 
 
 /**
- * Created by tully.
- *
- * Example for L01.1
- *
  * To start the application:
  * mvn package
  * java -jar ./L01-maven/target/L01-maven-jar-with-dependencies.jar
